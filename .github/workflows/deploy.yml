@@ -12,23 +12,25 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    # Add environment variables at the job level
-    env:
-      COPYRIGHT_TEXT: ${{ secrets.COPYRIGHT_TEXT }}
-      # Add other variables as needed
-    
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
       
-      # Create .env file from secrets
+      # Debug step to check secrets are available (safely)
+      - name: Debug Secret Availability
+        run: |
+          if [ -n "${{ secrets.COPYRIGHT_TEXT }}" ]; then
+            echo "✅ COPYRIGHT_TEXT secret is set"
+          else
+            echo "❌ COPYRIGHT_TEXT secret is NOT set"
+            echo "Please add this secret in your repository settings"
+          fi
+      
+      # Create .env file from secrets - using direct reference to GitHub secrets
       - name: Create .env file
         run: |
           touch .env
-          # Use the job-level environment variables which are populated from secrets
-          echo "COPYRIGHT_TEXT=${COPYRIGHT_TEXT}" >> .env
-          # Add any other environment variables you need
-          # Example: echo "OTHER_VAR=${OTHER_VAR}" >> .env
+          echo "COPYRIGHT_TEXT=${{ secrets.COPYRIGHT_TEXT }}" >> .env
           
           # Print confirmation (but not the values themselves)
           echo "Created .env file with the following keys:"
@@ -128,22 +130,8 @@ jobs:
           EOL
       
       - name: Build the App
-        # Pass the .env file to Trunk directly, if it supports this
-        run: |
-          # Print trunk version for debugging
-          trunk --version
-          
-          # Ensure the .env file exists
-          if [ -f .env ]; then
-            echo "Using .env file for build"
-          else
-            echo "ERROR: .env file not found"
-            exit 1
-          fi
-          
-          # Build with release flag and public URL
-          trunk build --release --public-url ./
-        # Explicitly set environment variables here again to ensure they're available during build
+        # Use the direct secrets reference for build environment
+        run: trunk build --release --public-url ./
         env:
           COPYRIGHT_TEXT: ${{ secrets.COPYRIGHT_TEXT }}
       
