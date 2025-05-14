@@ -20,7 +20,7 @@ jobs:
       - name: Create .env file
         run: |
           touch .env
-          echo "API_KEY=${{ secrets.COPYRIGHT_TEXT }}" >> .env
+          echo "COPYRIGHT_TEXT=${{ secrets.COPYRIGHT_TEXT }}" >> .env
           # Add any other environment variables you need
           # Example: echo "OTHER_VAR=${{ secrets.OTHER_VAR }}" >> .env
       
