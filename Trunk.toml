@@ -1,0 +1,6 @@
+[env]
+env_file = ".env"
+
+[build]
+dist = "dist"
+public_url = "./"
