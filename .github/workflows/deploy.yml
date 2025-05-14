@@ -6,7 +6,7 @@ on:
 # Add this permissions block
 permissions:
   contents: write
-  # Add permission for secrets
+  # Add permission for vars
   id-token: write
 
 jobs:
@@ -16,21 +16,21 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
       
-      # Debug step to check secrets are available (safely)
+      # Debug step to check vars are available (safely)
       - name: Debug Secret Availability
         run: |
-          if [ -n "${{ secrets.COPYRIGHT_TEXT }}" ]; then
+          if [ -n "${{ vars.COPYRIGHT_TEXT }}" ]; then
             echo "✅ COPYRIGHT_TEXT secret is set"
           else
             echo "❌ COPYRIGHT_TEXT secret is NOT set"
             echo "Please add this secret in your repository settings"
           fi
       
-      # Create .env file from secrets - using direct reference to GitHub secrets
+      # Create .env file from vars - using direct reference to GitHub vars
       - name: Create .env file
         run: |
           touch .env
-          echo "COPYRIGHT_TEXT=${{ secrets.COPYRIGHT_TEXT }}" >> .env
+          echo "COPYRIGHT_TEXT=${{ vars.COPYRIGHT_TEXT }}" >> .env
           
           # Print confirmation (but not the values themselves)
           echo "Created .env file with the following keys:"
@@ -130,10 +130,10 @@ jobs:
           EOL
       
       - name: Build the App
-        # Use the direct secrets reference for build environment
+        # Use the direct vars reference for build environment
         run: trunk build --release --public-url ./
         env:
-          COPYRIGHT_TEXT: ${{ secrets.COPYRIGHT_TEXT }}
+          COPYRIGHT_TEXT: ${{ vars.COPYRIGHT_TEXT }}
       
       - name: Copy 404.html to dist
         run: cp static/404.html dist/
